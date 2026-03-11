@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Token Spend Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b35, #c7161e, #0bb4a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .last-updated {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .timeframe-dropdown {
+            background: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .timeframe-dropdown:hover, .timeframe-dropdown:focus {
+            border-color: #666;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #555;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .card-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .budget-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .budget-safe { background: #155724; color: #d4edda; }
+        .budget-warning { background: #856404; color: #fff3cd; }
+        .budget-danger { background: #721c24; color: #f8d7da; }
+
+        .agent-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .agent-card.blade { border-left: 4px solid #c7161e; }
+        .agent-card.ember { border-left: 4px solid #ff6b35; }
+        .agent-card.sheath { border-left: 4px solid #0bb4a0; }
+        .agent-card.frank { border-left: 4px solid #f59e0b; }
+
+        .agent-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .days-badge {
+            background: #444;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .agent-spend {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .model-split {
+            margin: 15px 0;
+        }
+
+        .model-bar {
+            display: flex;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+            background: #333;
+        }
+
+        .model-opus {
+            background: linear-gradient(45deg, #8b5cf6, #a78bfa);
+        }
+
+        .model-sonnet {
+            background: linear-gradient(45deg, #10b981, #34d399);
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart {
+            display: flex;
+            align-items: end;
+            height: 300px;
+            gap: 8px;
+            padding: 20px;
+            min-width: 600px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .bar-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 4px 4px 0 0;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .bar-segment {
+            width: 100%;
+            min-height: 2px;
+            transition: opacity 0.2s ease;
+        }
+
+        .bar-segment.blade { background: #c7161e; }
+        .bar-segment.ember { background: #ff6b35; }
+        .bar-segment.sheath { background: #0bb4a0; }
+        .bar-segment.frank { background: #f59e0b; }
+
+        .bar-label {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #ccc;
+            transform: rotate(-45deg);
+            transform-origin: center;
+        }
+
+        .bar-amount {
+            position: absolute;
+            top: -25px;
+            font-size: 0.7em;
+            color: #fff;
+            background: rgba(0,0,0,0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .bar-stack:hover .bar-amount {
+            opacity: 1;
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: right;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+        }
+
+        th {
+            background: #2a2a2a;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            user-select: none;
+        }
+
+        th:hover {
+            background: #3a3a3a;
+        }
+
+        th:first-child, td:first-child {
+            text-align: left;
+        }
+
+        .cell-blade { background: rgba(199, 22, 30, 0.1); }
+        .cell-ember { background: rgba(255, 107, 53, 0.1); }
+        .cell-sheath { background: rgba(11, 180, 160, 0.1); }
+        .cell-frank { background: rgba(245, 158, 11, 0.1); }
+
+        .progress-container {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #333;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #0bb4a0, #ff6b35, #c7161e);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .projection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .projection-item {
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid, .agent-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .chart {
+                padding: 10px;
+                min-width: 400px;
+            }
+            
+            .bar-label {
+                font-size: 0.7em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div id="logoContainer" style="margin-bottom: 10px;">
+                <!-- Logo will be inserted here -->
+            </div>
+            <h1>⚔️ Viking Token Spend Dashboard</h1>
+            <div class="header-controls">
+                <div class="last-updated">Last updated: <span id="lastUpdated"></span></div>
+                <select class="timeframe-dropdown" id="timeframeSelector">
+                    <option value="1" selected>Today</option>
+                    <option value="3">Last 3 Days</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Total Spend</span>
+                    <span class="days-badge" id="totalDaysBadge" style="font-size: 0.85em;">∞</span>
+                </div>
+                <div class="card-value" id="totalSpend">$0.00</div>
+                <div class="card-subtitle" id="dateRangeLabel">March 1-11, 2026</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Daily Average</div>
+                <div class="card-value" id="dailyAverage">$0.00</div>
+                <div class="card-subtitle">Based on active days</div>
+            </div>
+            <div class="card" id="periodGoalCard">
+                <div class="card-title">Period Goal</div>
+                <div class="card-value">
+                    <span id="monthlyProjection">$0</span>
+                    <span class="budget-status" id="budgetStatus">✅</span>
+                </div>
+                <div class="card-subtitle" id="periodGoalSubtitle">vs $2,000 budget</div>
+            </div>
+        </div>
+
+        <div class="agent-cards">
+            <div class="agent-card blade">
+                <div class="agent-name">
+                    <span>🔪 Blade</span>
+                    <span class="days-badge" id="bladeDays">11 days</span>
+                </div>
+                <div class="agent-spend" id="bladeSpend">$0.00</div>
+                <div class="model-split">
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">Model Usage:</div>
+                    <div class="model-bar" id="bladeModelBar"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #ccc;">
+                        <span>Opus</span>
+                        <span>Sonnet</span>
+                    </div>
+                </div>
+                <div class="card-subtitle"><span id="bladePercent">0%</span> of total spend</div>
+            </div>
+            <div class="agent-card ember">
+                <div class="agent-name">
+                    <span>🔥 Ember</span>
+                    <span class="days-badge" id="emberDays">11 days</span>
+                </div>
+                <div class="agent-spend" id="emberSpend">$0.00</div>
+                <div class="model-split">
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">Model Usage:</div>
+                    <div class="model-bar" id="emberModelBar"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #ccc;">
+                        <span>Opus</span>
+                        <span>Sonnet</span>
+                    </div>
+                </div>
+                <div class="card-subtitle"><span id="emberPercent">0%</span> of total spend</div>
+            </div>
+            <div class="agent-card sheath">
+                <div class="agent-name">
+                    <span>🗡️ Sheath</span>
+                    <span class="days-badge" id="sheathDays">11 days</span>
+                </div>
+                <div class="agent-spend" id="sheathSpend">$0.00</div>
+                <div class="model-split">
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">Model Usage:</div>
+                    <div class="model-bar" id="sheathModelBar"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #ccc;">
+                        <span>Opus</span>
+                        <span>Sonnet</span>
+                    </div>
+                </div>
+                <div class="card-subtitle"><span id="sheathPercent">0%</span> of total spend</div>
+            </div>
+            <div class="agent-card frank">
+                <div class="agent-name">
+                    <span>🧪 Frank</span>
+                    <span class="days-badge" id="frankDays">0 days</span>
+                </div>
+                <div class="agent-spend" id="frankSpend">$0.00</div>
+                <div class="model-split">
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">Model Usage:</div>
+                    <div class="model-bar" id="frankModelBar"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #ccc;">
+                        <span>Opus</span>
+                        <span>Sonnet</span>
+                    </div>
+                </div>
+                <div class="card-subtitle"><span id="frankPercent">0%</span> of total spend</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Daily Spend Breakdown</div>
+            <div class="chart" id="dailyChart"></div>
+        </div>
+
+        <div class="table-container">
+            <div class="chart-title">Daily Breakdown Table</div>
+            <table id="dailyTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Date</th>
+                        <th onclick="sortTable(1)">🔪 Blade</th>
+                        <th onclick="sortTable(2)">🔥 Ember</th>
+                        <th onclick="sortTable(3)">🗡️ Sheath</th>
+                        <th onclick="sortTable(4)">🧪 Frank</th>
+                        <th onclick="sortTable(5)">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="progress-container">
+            <div class="chart-title">Period Goal Tracker</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="budgetProgress"></div>
+                <div class="progress-text" id="budgetProgressText">0%</div>
+            </div>
+            <div class="projection-grid">
+                <div class="projection-item">
+                    <div style="font-size: 1.2em; font-weight: bold;" id="daysRemaining">20</div>
+                    <div style="color: #ccc;">Days in Period</div>
+                </div>
+                <div class="projection-item">
+                    <div style="font-size: 1.2em; font-weight: bold;" id="projectionAmount">$2,000</div>
+                    <div style="color: #ccc;">Period Goal</div>
+                </div>
+                <div class="projection-item">
+                    <div style="font-size: 1.2em; font-weight: bold;" id="budgetRemaining">$1,000</div>
+                    <div style="color: #ccc;">Under / Over Goal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Embedded CSV data
+        const csvData = `usage_date_utc,model,workspace,api_key,usage_type,context_window,token_type,cost_usd,cost_type,inference_geo,speed
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,0.07,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,0.28,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.03,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,3.12,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,20.88,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.42,token,global,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_cache_read,0.13,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_cache_write_5m,0.56,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,output,0.03,token,not_available,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,11.49,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,10.72,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,6.08,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,1.61,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.01,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,4.71,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,13.22,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.42,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.01,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,12.77,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,63.43,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,1.69,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,14.60,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,54.12,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,3.25,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,0.13,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,23.73,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,0.07,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,1.64,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,12.62,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,0.26,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.07,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,66.08,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,73.95,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,7.67,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_read,1.59,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,12.52,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,output,0.16,token,global,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_read,0.82,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_write_5m,1.59,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,0.33,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_no_cache,0.03,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_read,10.10,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_write_5m,27.35,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,output,5.67,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_no_cache,0.01,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_read,0.52,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_write_5m,3.81,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,output,0.30,token,not_available,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,0.69,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,25.62,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,0.42,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.03,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,39.52,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,32.81,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,27.77,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,5.37,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.02,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_read,8.27,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,39.32,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,output,1.59,token,global,
+2026-03-11,Claude Opus 4.6,,,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-11,Claude Opus 4.6,,,message,≤ 200k,output,0.03,token,global,
+2026-03-11,Claude Opus 4.6,,,message,≤ 200k,output,0.01,token,global,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_no_cache,0.02,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_read,2.42,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_write_5m,5.53,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,1.31,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_read,0.35,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_write_5m,1.19,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,output,0.31,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_no_cache,0.03,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_read,6.51,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_write_5m,29.10,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,output,3.43,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_no_cache,0.01,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_read,2.39,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_write_5m,4.47,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,output,1.59,token,not_available,`;
+
+        // Pricing per million tokens
+        const pricing = {
+            opus: { input: 15, output: 75, cache_read: 1.50 },
+            sonnet: { input: 3, output: 15, cache_read: 0.30 }
+        };
+
+        // Parse CSV data
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',');
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index];
+                });
+                data.push(row);
+            }
+            return data;
+        }
+
+        // Calculate cost for a row — uses cost_usd directly from console CSV
+        function calculateCost(row) {
+            return parseFloat(row.cost_usd || 0);
+        }
+
+        // Calculate date range based on timeframe selection
+        function getDateRange(timeframe, allDates) {
+            if (timeframe === 'all') return null;
+            
+            // Always use TODAY as the anchor, not the most recent data date
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+            
+            const cutoffDate = new Date(today);
+            cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeframe) + 1);
+            
+            return cutoffDate.toISOString().split('T')[0];
+        }
+
+        // Process data and calculate metrics
+        function processData(timeframe = 'all') {
+            const data = parseCSV(csvData);
+            
+            // Get all dates first to determine range
+            const allDates = [...new Set(data.map(row => row.usage_date_utc))];
+            const cutoffDate = getDateRange(timeframe, allDates);
+            
+            // Filter data by date range if needed
+            const filteredData = cutoffDate ? 
+                data.filter(row => row.usage_date_utc >= cutoffDate) : 
+                data;
+                
+            const dailyTotals = {};
+            const agentTotals = { Blade: 0, Ember: 0, Sheath: 0, Frank: 0 };
+            const agentModelSplit = { 
+                Blade: { opus: 0, sonnet: 0 }, 
+                Ember: { opus: 0, sonnet: 0 }, 
+                Sheath: { opus: 0, sonnet: 0 },
+                Frank: { opus: 0, sonnet: 0 }
+            };
+            
+            let totalSpend = 0;
+            
+            filteredData.forEach(row => {
+                const date = row.usage_date_utc;
+                const agent = row.api_key;
+                const cost = calculateCost(row);
+                const modelStr = (row.model_version || row.model || '').toLowerCase();
+                const isOpus = modelStr.includes('opus');
+                
+                // Daily totals
+                if (!dailyTotals[date]) {
+                    dailyTotals[date] = { Blade: 0, Ember: 0, Sheath: 0, Frank: 0, total: 0 };
+                }
+                
+                // Only process known agents
+                if (agentTotals.hasOwnProperty(agent)) {
+                    dailyTotals[date][agent] += cost;
+                    dailyTotals[date].total += cost;
+                    
+                    // Agent totals
+                    agentTotals[agent] += cost;
+                    totalSpend += cost;
+                    
+                    // Model split
+                    if (isOpus) {
+                        agentModelSplit[agent].opus += cost;
+                    } else {
+                        agentModelSplit[agent].sonnet += cost;
+                    }
+                }
+            });
+            
+            // Get all dates from full CSV to determine overall range
+            const allSortedDates = [...new Set(data.map(r => r.usage_date_utc))].sort();
+            const overallEnd = allSortedDates[allSortedDates.length - 1];
+            const overallStart = allSortedDates[0];
+            
+            // Determine the full calendar range for this view
+            // ALWAYS anchor to TODAY, not the last data date
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            let periodStart, periodEnd;
+            if (timeframe === 'all') {
+                periodStart = overallStart || todayStr;
+                periodEnd = todayStr;
+            } else {
+                const startDate = new Date(today);
+                startDate.setDate(startDate.getDate() - parseInt(timeframe) + 1);
+                periodStart = startDate.toISOString().split('T')[0];
+                periodEnd = todayStr;
+            }
+            
+            // Fill in ALL calendar days in the period (including days with zero spend)
+            const pStart = new Date(periodStart + 'T00:00:00Z');
+            const pEnd = new Date(periodEnd + 'T00:00:00Z');
+            for (let d = new Date(pStart); d <= pEnd; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                if (!dailyTotals[dateStr]) {
+                    dailyTotals[dateStr] = { Blade: 0, Ember: 0, Sheath: 0, Frank: 0, total: 0 };
+                }
+            }
+            
+            // Days with actual data
+            const daysWithData = Object.keys(dailyTotals).filter(date => dailyTotals[date].total > 0).length;
+            // Total calendar days in period
+            const calendarDays = Math.round((pEnd - pStart) / (1000 * 60 * 60 * 24)) + 1;
+            
+            const dateRangeInfo = {
+                startDate: periodStart,
+                endDate: periodEnd,
+                timeframe: timeframe,
+                calendarDays: calendarDays
+            };
+            
+            return { dailyTotals, agentTotals, agentModelSplit, totalSpend, daysInView: daysWithData, dateRangeInfo };
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Update summary cards
+        function updateSummaryCards(metrics) {
+            const { totalSpend, dailyTotals, daysInView, dateRangeInfo } = metrics;
+            
+            // Calculate daily average based on days with actual data
+            const dailyAverage = daysInView > 0 ? totalSpend / daysInView : 0;
+            
+            // Calculate period goal based on timeframe
+            // Goal is always derived from $2,000/month ($64.52/day)
+            const dailyGoalRate = 2000 / 30.44; // avg days per month
+            let periodGoal, periodLabel;
+            
+            switch (dateRangeInfo.timeframe) {
+                case '1': // Today
+                    periodGoal = dailyGoalRate;
+                    periodLabel = `Daily Goal: ${formatCurrency(periodGoal)}`;
+                    break;
+                case '3': // Last 3 Days
+                    periodGoal = dailyGoalRate * 3;
+                    periodLabel = `3-Day Goal: ${formatCurrency(periodGoal)}`;
+                    break;
+                case '7': // Last 7 Days
+                    periodGoal = dailyGoalRate * 7;
+                    periodLabel = `Weekly Goal: ${formatCurrency(periodGoal)}`;
+                    break;
+                default: // All time — calculate based on actual calendar span
+                    const calDays = dateRangeInfo.calendarDays || 31;
+                    periodGoal = dailyGoalRate * calDays;
+                    periodLabel = `${calDays}-Day Goal: ${formatCurrency(periodGoal)}`;
+                    break;
+            }
+            const goalCard = document.getElementById('periodGoalCard');
+            const goalSubtitle = document.getElementById('periodGoalSubtitle');
+            const projectionEl = document.getElementById('monthlyProjection');
+            const budgetStatusEl = document.getElementById('budgetStatus');
+            
+            goalSubtitle.textContent = periodLabel;
+            
+            // Show over/under budget amount
+            const difference = periodGoal - totalSpend;
+            const onTrack = difference >= 0;
+            if (onTrack) {
+                projectionEl.textContent = formatCurrency(difference) + ' under';
+                projectionEl.style.color = '#4caf50';
+                budgetStatusEl.textContent = '✅';
+            } else {
+                projectionEl.textContent = formatCurrency(Math.abs(difference)) + ' over';
+                projectionEl.style.color = '#ef4444';
+                budgetStatusEl.textContent = '🔴';
+            }
+            goalCard.style.borderTop = onTrack ? '3px solid #4caf50' : '3px solid #ef4444';
+            
+            // Update date range label
+            let dateRangeText;
+            if (dateRangeInfo.timeframe === '1') {
+                const today = new Date();
+                dateRangeText = today.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            } else if (dateRangeInfo.startDate && dateRangeInfo.endDate) {
+                const startDate = new Date(dateRangeInfo.startDate + 'T00:00:00Z');
+                const endDate = new Date(dateRangeInfo.endDate + 'T00:00:00Z');
+                
+                if (dateRangeInfo.startDate === dateRangeInfo.endDate) {
+                    dateRangeText = startDate.toLocaleDateString('en-US', { 
+                        month: 'long', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                } else {
+                    dateRangeText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                }
+            } else {
+                dateRangeText = 'March 1-11, 2026'; // Fallback
+            }
+            
+            document.getElementById('dateRangeLabel').textContent = dateRangeText;
+            
+            // Update total days badge on Total Spend card
+            const totalDaysBadge = document.getElementById('totalDaysBadge');
+            if (dateRangeInfo.timeframe === 'all') {
+                totalDaysBadge.textContent = '∞';
+            } else if (daysInView === 1) {
+                totalDaysBadge.textContent = '1 day';
+            } else {
+                totalDaysBadge.textContent = `${daysInView} days`;
+            }
+            
+            document.getElementById('totalSpend').textContent = formatCurrency(totalSpend);
+            document.getElementById('dailyAverage').textContent = formatCurrency(dailyAverage);
+            
+            // Budget status already handled above in Period Goal section
+        }
+
+        // Update agent cards
+        function updateAgentCards(metrics) {
+            const { agentTotals, agentModelSplit, totalSpend, daysInView } = metrics;
+            
+            ['Blade', 'Ember', 'Sheath', 'Frank'].forEach(agent => {
+                const spend = agentTotals[agent];
+                const percent = totalSpend > 0 ? ((spend / totalSpend) * 100).toFixed(1) : 0;
+                const modelData = agentModelSplit[agent];
+                const opusPercent = (modelData.opus + modelData.sonnet) > 0 ? 
+                    (modelData.opus / (modelData.opus + modelData.sonnet)) * 100 : 0;
+                const sonnetPercent = 100 - opusPercent;
+                
+                document.getElementById(`${agent.toLowerCase()}Spend`).textContent = formatCurrency(spend);
+                document.getElementById(`${agent.toLowerCase()}Percent`).textContent = `${percent}%`;
+                
+                // Days badge — matches the period being viewed (same for all agents)
+                const timeframe = document.getElementById('timeframeSelector').value;
+                let daysText;
+                if (timeframe === 'all') {
+                    daysText = '∞';
+                } else {
+                    const periodDays = parseInt(timeframe);
+                    daysText = periodDays === 1 ? '1 day' : `${periodDays} days`;
+                }
+                document.getElementById(`${agent.toLowerCase()}Days`).textContent = daysText;
+                
+                // Model bar
+                const bar = document.getElementById(`${agent.toLowerCase()}ModelBar`);
+                if (spend > 0) {
+                    bar.innerHTML = `
+                        <div class="model-opus" style="width: ${opusPercent}%; height: 100%;"></div>
+                        <div class="model-sonnet" style="width: ${sonnetPercent}%; height: 100%;"></div>
+                    `;
+                } else {
+                    // Show empty bar for agents with no spend
+                    bar.innerHTML = `
+                        <div style="width: 100%; height: 100%; background: #333;"></div>
+                    `;
+                }
+            });
+        }
+
+        // Build full month of daily totals (March 1-31)
+        function buildFullMonthTotals(filteredTotals) {
+            // Get the month from the data (use first available date)
+            const existingDates = Object.keys(filteredTotals).sort();
+            let year = 2026, month = 2; // March (0-indexed)
+            if (existingDates.length > 0) {
+                const d = new Date(existingDates[0] + 'T00:00:00Z');
+                year = d.getUTCFullYear();
+                month = d.getUTCMonth();
+            }
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const fullMonth = {};
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                fullMonth[dateStr] = filteredTotals[dateStr] || { Blade: 0, Ember: 0, Sheath: 0, Frank: 0, total: 0 };
+            }
+            return fullMonth;
+        }
+
+        // Create daily chart
+        function createDailyChart(dailyTotals, dateRangeInfo) {
+            const chartContainer = document.getElementById('dailyChart');
+            const dates = Object.keys(dailyTotals).sort();
+            const maxTotal = Math.max(...dates.map(date => dailyTotals[date].total), 1);
+            
+            // Determine which dates are in the selected period (for highlighting)
+            const inPeriod = new Set();
+            if (dateRangeInfo && dateRangeInfo.startDate && dateRangeInfo.endDate) {
+                dates.forEach(d => {
+                    if (d >= dateRangeInfo.startDate && d <= dateRangeInfo.endDate) inPeriod.add(d);
+                });
+            } else {
+                dates.forEach(d => inPeriod.add(d)); // all time = all in period
+            }
+            
+            chartContainer.innerHTML = '';
+            
+            dates.forEach(date => {
+                const dayData = dailyTotals[date];
+                const isInPeriod = inPeriod.has(date);
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar';
+                // Dim bars outside selected period
+                if (!isInPeriod) barContainer.style.opacity = '0.25';
+                
+                const barStack = document.createElement('div');
+                barStack.className = 'bar-stack';
+                
+                if (dayData.total === 0) {
+                    barStack.innerHTML = `
+                        <div style="height: 2px; width: 100%; background: #333; border-radius: 1px;"></div>
+                    `;
+                } else {
+                    const totalHeight = (dayData.total / maxTotal) * 280;
+                    const bladeHeight = dayData.Blade > 0 ? (dayData.Blade / dayData.total) * totalHeight : 0;
+                    const emberHeight = dayData.Ember > 0 ? (dayData.Ember / dayData.total) * totalHeight : 0;
+                    const sheathHeight = dayData.Sheath > 0 ? (dayData.Sheath / dayData.total) * totalHeight : 0;
+                    const frankHeight = dayData.Frank > 0 ? (dayData.Frank / dayData.total) * totalHeight : 0;
+                    
+                    barStack.innerHTML = `
+                        <div class="bar-segment blade" style="height: ${bladeHeight}px;"></div>
+                        <div class="bar-segment ember" style="height: ${emberHeight}px;"></div>
+                        <div class="bar-segment sheath" style="height: ${sheathHeight}px;"></div>
+                        ${frankHeight > 0 ? `<div class="bar-segment" style="height: ${frankHeight}px; background: linear-gradient(45deg, #f59e0b, #fbbf24);"></div>` : ''}
+                        <div class="bar-amount">${isInPeriod ? formatCurrency(dayData.total) : ''}</div>
+                    `;
+                }
+                
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                const dayNum = new Date(date + 'T00:00:00Z').getUTCDate();
+                label.textContent = dayNum; // Just show day number for 31 bars
+                
+                barContainer.appendChild(barStack);
+                barContainer.appendChild(label);
+                chartContainer.appendChild(barContainer);
+            });
+        }
+
+        // Create daily table
+        function createDailyTable(dailyTotals) {
+            const tbody = document.getElementById('dailyTableBody');
+            const dates = Object.keys(dailyTotals).sort().reverse(); // Most recent first
+            
+            tbody.innerHTML = '';
+            
+            dates.forEach(date => {
+                const dayData = dailyTotals[date];
+                const row = document.createElement('tr');
+                
+                const dateFormatted = new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+                
+                const rowStyle = dayData.total === 0 ? ' style="opacity: 0.4;"' : '';
+                row.innerHTML = `
+                    <td${rowStyle}>${dateFormatted}</td>
+                    <td class="cell-blade"${rowStyle}>${formatCurrency(dayData.Blade)}</td>
+                    <td class="cell-ember"${rowStyle}>${formatCurrency(dayData.Ember)}</td>
+                    <td class="cell-sheath"${rowStyle}>${formatCurrency(dayData.Sheath)}</td>
+                    <td${rowStyle}>${formatCurrency(dayData.Frank)}</td>
+                    <td style="font-weight: bold;${dayData.total === 0 ? ' opacity: 0.4;' : ''}">${formatCurrency(dayData.total)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update budget tracker
+        function updateBudgetTracker(metrics) {
+            const { totalSpend, daysInView, dateRangeInfo } = metrics;
+            const dailyGoalRate = 2000 / 30.44;
+            
+            let periodGoal, periodDays;
+            
+            switch (dateRangeInfo.timeframe) {
+                case '1':
+                    periodGoal = dailyGoalRate;
+                    periodDays = 1;
+                    break;
+                case '3':
+                    periodGoal = dailyGoalRate * 3;
+                    periodDays = 3;
+                    break;
+                case '7':
+                    periodGoal = dailyGoalRate * 7;
+                    periodDays = 7;
+                    break;
+                default:
+                    if (dateRangeInfo.startDate && dateRangeInfo.endDate) {
+                        const start = new Date(dateRangeInfo.startDate + 'T00:00:00Z');
+                        const end = new Date(dateRangeInfo.endDate + 'T00:00:00Z');
+                        periodDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                        periodGoal = dailyGoalRate * periodDays;
+                    } else {
+                        periodGoal = 2000;
+                        periodDays = 31;
+                    }
+                    break;
+            }
+            
+            const progressPercent = (totalSpend / periodGoal) * 100;
+            const onTrack = totalSpend <= periodGoal;
+            const budgetRemaining = periodGoal - totalSpend;
+            
+            const progressBar = document.getElementById('budgetProgress');
+            progressBar.style.width = `${Math.min(progressPercent, 100)}%`;
+            progressBar.style.background = onTrack ? 'linear-gradient(90deg, #4caf50, #66bb6a)' : 'linear-gradient(90deg, #ef4444, #f87171)';
+            
+            document.getElementById('budgetProgressText').textContent = `${progressPercent.toFixed(1)}%`;
+            document.getElementById('daysRemaining').textContent = periodDays;
+            document.getElementById('projectionAmount').textContent = formatCurrency(periodGoal);
+            document.getElementById('budgetRemaining').textContent = formatCurrency(budgetRemaining);
+        }
+
+        // Sort table function
+        let sortDirection = {};
+        function sortTable(columnIndex) {
+            const table = document.getElementById('dailyTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = Array.from(tbody.rows);
+            
+            const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+            sortDirection[columnIndex] = direction;
+            
+            rows.sort((a, b) => {
+                let aVal = a.cells[columnIndex].textContent;
+                let bVal = b.cells[columnIndex].textContent;
+                
+                // Handle currency values
+                if (columnIndex > 0) {
+                    aVal = parseFloat(aVal.replace(/[$,]/g, '')) || 0;
+                    bVal = parseFloat(bVal.replace(/[$,]/g, '')) || 0;
+                }
+                
+                if (direction === 'asc') {
+                    return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                } else {
+                    return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+                }
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Refresh dashboard with current timeframe
+        function refreshDashboard() {
+            const timeframe = document.getElementById('timeframeSelector').value;
+            const metrics = processData(timeframe);
+            
+            // Set last updated
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            
+            // Update all sections
+            updateSummaryCards(metrics);
+            updateAgentCards(metrics);
+            // Chart always shows full month regardless of timeframe filter
+            const fullMonthTotals = buildFullMonthTotals(metrics.dailyTotals);
+            createDailyChart(fullMonthTotals, metrics.dateRangeInfo);
+            createDailyTable(metrics.dailyTotals);
+            updateBudgetTracker(metrics);
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            // Set up timeframe dropdown event handler
+            document.getElementById('timeframeSelector').addEventListener('change', refreshDashboard);
+            
+            // Initial load
+            refreshDashboard();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
