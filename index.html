@@ -532,41 +532,121 @@
     </div>
 
     <script>
-        // Embedded CSV data
-        const csvData = `usage_date_utc,model_version,api_key,workspace,usage_type,context_window,usage_input_tokens_no_cache,usage_input_tokens_cache_write_5m,usage_input_tokens_cache_write_1h,usage_input_tokens_cache_read,usage_output_tokens,web_search_count,inference_geo,speed
-2026-03-03,claude-sonnet-4-6,Blade,Default,standard,≤ 200k,40,75577,0,224346,2194,0,global,
-2026-03-04,claude-sonnet-4-6,Blade,Default,standard,≤ 200k,350,5567940,0,10411350,27914,0,global,
-2026-03-05,claude-opus-4-5-20251101,Blade,Default,standard,≤ 200k,38,90266,0,264358,1117,0,global,
-2026-03-05,claude-opus-4-6,Blade,Default,standard,≤ 200k,501,2686695,0,22978250,64414,0,global,
-2026-03-05,claude-sonnet-4-6,Blade,Default,standard,≤ 200k,1790,3526563,0,15700709,28239,0,global,
-2026-03-06,claude-opus-4-6,Blade,Default,standard,≤ 200k,1197,10149370,0,25535920,67703,0,global,
-2026-03-07,claude-opus-4-6,Sheath,Default,standard,≤ 200k,772,8658839,0,29190602,129981,0,global,
-2026-03-07,claude-opus-4-6,Blade,Default,standard,≤ 200k,56,3796851,0,263494,2782,0,global,
-2026-03-10,claude-opus-4-6,Sheath,Default,standard,≤ 200k,60,2019677,0,3272108,10288,0,global,
-2026-03-10,claude-sonnet-4-20250514,Sheath,Default,standard,≤ 200k,1228,424894,0,2727186,22093,0,global,
-2026-03-10,claude-opus-4-6,Blade,Default,standard,≤ 200k,14811,11832262,0,132157193,306618,0,global,
-2026-03-10,claude-sonnet-4-20250514,Blade,Default,standard,≤ 200k,9385,7293541,0,33679651,378109,0,global,
-2026-03-10,claude-opus-4-6,Ember,Default,standard,≤ 200k,148,2002881,0,3186511,6218,0,global,
-2026-03-10,claude-sonnet-4-20250514,Ember,Default,standard,≤ 200k,1667,1016988,0,1747954,20075,0,global,
-2026-03-11,claude-opus-4-6,Sheath,Default,standard,≤ 200k,118,4178684,0,1464047,17673,0,global,
-2026-03-11,claude-sonnet-4-20250514,Sheath,Default,standard,≤ 200k,6463,1761353,0,9665948,103476,0,global,
-2026-03-11,claude-opus-4-6,Blade2,Default,standard,≤ 200k,112,1058149,0,5837917,9638,0,global,
-2026-03-11,claude-sonnet-4-20250514,Frank,Default,standard,≤ 200k,574,317107,0,1173238,20428,0,global,
-2026-03-11,claude-opus-4-6,Blade,Default,standard,≤ 200k,7416,12572926,0,100252915,262095,0,global,
-2026-03-11,claude-sonnet-4-20250514,Blade,Default,standard,≤ 200k,11860,9389940,0,27596500,284956,0,global,
-2026-03-11,claude-opus-4-6,Ember,Default,standard,≤ 200k,3740,7435026,0,27222935,79022,0,global,
-2026-03-11,claude-sonnet-4-20250514,Ember,Default,standard,≤ 200k,2856,1191121,0,7951599,105852,0,global,
-2026-03-12,claude-opus-4-6,Sheath,Default,standard,≤ 200k,338,970396,0,3510684,18133,0,global,
-2026-03-12,claude-sonnet-4-20250514,Sheath,Default,standard,≤ 200k,6133,1722282,0,9138550,96319,0,global,
-2026-03-12,claude-opus-4-6,Blade2,Default,standard,≤ 200k,30845,20247159,0,183429917,764404,0,global,
-2026-03-12,claude-opus-4-6,Ember,Default,standard,≤ 200k,371,741444,0,6349852,14536,0,global,
-2026-03-12,claude-sonnet-4-20250514,Frank,Default,standard,≤ 200k,90,50906,0,316393,2342,0,global,`;
-
-        // Pricing per million tokens
-        const pricing = {
-            opus: { input: 15, output: 75, cache_read: 1.50 },
-            sonnet: { input: 3, output: 15, cache_read: 0.30 }
-        };
+        // Embedded CSV data — exact cost_usd from Anthropic Console export (Mar 1-12, 2026)
+        const csvData = `usage_date_utc,model,workspace,api_key,usage_type,context_window,token_type,cost_usd,cost_type,inference_geo,speed
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,0.07,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,0.28,token,global,
+2026-03-03,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.03,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,3.12,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,20.88,token,global,
+2026-03-04,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.42,token,global,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_cache_read,0.13,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,input_cache_write_5m,0.56,token,not_available,
+2026-03-05,Claude Opus 4.5,Default,Blade,message,≤ 200k,output,0.03,token,not_available,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,8.81,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,2.67,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,16.79,token,global,
+2026-03-05,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,1.61,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.01,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_read,4.71,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,13.22,token,global,
+2026-03-05,Claude Sonnet 4.6,Default,Blade,message,≤ 200k,output,0.42,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.01,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,12.77,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,63.43,token,global,
+2026-03-06,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,1.69,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,14.60,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,54.12,token,global,
+2026-03-07,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,3.25,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,0.13,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,23.73,token,global,
+2026-03-07,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,0.07,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,1.64,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,12.62,token,global,
+2026-03-10,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,0.26,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.07,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,66.08,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,73.95,token,global,
+2026-03-10,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,7.67,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_read,1.59,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,12.52,token,global,
+2026-03-10,Claude Opus 4.6,Default,Ember,message,≤ 200k,output,0.16,token,global,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_read,0.82,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_write_5m,1.59,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,0.33,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_no_cache,0.03,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_read,10.10,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_write_5m,27.35,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Blade,message,≤ 200k,output,5.67,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_no_cache,0.01,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_read,0.52,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_write_5m,3.81,token,not_available,
+2026-03-10,Claude Sonnet 4,Default,Ember,message,≤ 200k,output,0.30,token,not_available,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,0.73,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,26.12,token,global,
+2026-03-11,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,0.44,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_cache_read,2.92,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_cache_write_5m,6.61,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade2,message,≤ 200k,output,0.24,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_no_cache,0.04,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_read,50.13,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,8.26,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,input_cache_write_5m,70.32,token,global,
+2026-03-11,Claude Opus 4.6,Default,Blade,message,≤ 200k,output,6.55,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.02,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_read,13.61,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,46.47,token,global,
+2026-03-11,Claude Opus 4.6,Default,Ember,message,≤ 200k,output,1.98,token,global,
+2026-03-11,Claude Opus 4.6,,,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-11,Claude Opus 4.6,,,message,≤ 200k,output,0.03,token,global,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_no_cache,0.02,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_read,2.90,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_write_5m,6.61,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,1.55,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_read,0.35,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_write_5m,1.19,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Frank,message,≤ 200k,output,0.31,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_no_cache,0.04,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_read,8.28,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,input_cache_write_5m,35.21,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Blade,message,≤ 200k,output,4.27,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_no_cache,0.01,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_read,2.39,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,input_cache_write_5m,4.47,token,not_available,
+2026-03-11,Claude Sonnet 4,Default,Ember,message,≤ 200k,output,1.59,token,not_available,
+2026-03-12,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-12,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_read,1.76,token,global,
+2026-03-12,Claude Opus 4.6,Default,Sheath,message,≤ 200k,input_cache_write_5m,6.06,token,global,
+2026-03-12,Claude Opus 4.6,Default,Sheath,message,≤ 200k,output,0.45,token,global,
+2026-03-12,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_no_cache,0.15,token,global,
+2026-03-12,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_cache_read,95.44,token,global,
+2026-03-12,Claude Opus 4.6,Default,Blade2,message,≤ 200k,input_cache_write_5m,129.86,token,global,
+2026-03-12,Claude Opus 4.6,Default,Blade2,message,≤ 200k,output,19.33,token,global,
+2026-03-12,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.00,token,global,
+2026-03-12,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_read,3.17,token,global,
+2026-03-12,Claude Opus 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,4.63,token,global,
+2026-03-12,Claude Opus 4.6,Default,Ember,message,≤ 200k,output,0.36,token,global,
+2026-03-12,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_no_cache,0.02,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_read,2.77,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Sheath,message,≤ 200k,input_cache_write_5m,6.47,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,1.24,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Sheath,message,≤ 200k,output,0.22,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_no_cache,0.00,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_read,0.09,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Frank,message,≤ 200k,input_cache_write_5m,0.19,token,not_available,
+2026-03-12,Claude Sonnet 4,Default,Frank,message,≤ 200k,output,0.04,token,not_available,`;
 
         // Parse CSV data
         function parseCSV(csvText) {
@@ -585,37 +665,9 @@
             return data;
         }
 
-        // Calculate cost for a row — uses cost_usd directly from console CSV
+        // Calculate cost for a row — uses cost_usd directly from Anthropic Console CSV
         function calculateCost(row) {
-            // If cost_usd exists, use it
-            if (row.cost_usd && parseFloat(row.cost_usd) > 0) return parseFloat(row.cost_usd);
-            
-            // Otherwise calculate from token counts
-            const model = (row.model_version || '').toLowerCase();
-            let inputRate, cacheWriteRate, cacheReadRate, outputRate;
-            
-            if (model.includes('opus')) {
-                inputRate = 15; cacheWriteRate = 18.75; cacheReadRate = 1.50; outputRate = 75;
-            } else if (model.includes('sonnet')) {
-                inputRate = 3; cacheWriteRate = 3.75; cacheReadRate = 0.30; outputRate = 15;
-            } else if (model.includes('haiku')) {
-                inputRate = 0.25; cacheWriteRate = 0.30; cacheReadRate = 0.03; outputRate = 1.25;
-            } else {
-                inputRate = 3; cacheWriteRate = 3.75; cacheReadRate = 0.30; outputRate = 15;
-            }
-            
-            const uncached = parseInt(row.usage_input_tokens_no_cache || 0);
-            const cacheWrite5m = parseInt(row.usage_input_tokens_cache_write_5m || 0);
-            const cacheWrite1h = parseInt(row.usage_input_tokens_cache_write_1h || 0);
-            const cacheRead = parseInt(row.usage_input_tokens_cache_read || 0);
-            const output = parseInt(row.usage_output_tokens || 0);
-            
-            const cost = (uncached / 1e6 * inputRate) +
-                         ((cacheWrite5m + cacheWrite1h) / 1e6 * cacheWriteRate) +
-                         (cacheRead / 1e6 * cacheReadRate) +
-                         (output / 1e6 * outputRate);
-            
-            return cost;
+            return parseFloat(row.cost_usd || 0);
         }
 
         // Calculate date range based on timeframe selection
@@ -660,7 +712,7 @@
                 const date = row.usage_date_utc;
                 const agent = row.api_key === 'Blade2' ? 'Blade' : row.api_key;
                 const cost = calculateCost(row);
-                const modelStr = (row.model_version || row.model || '').toLowerCase();
+                const modelStr = (row.model || row.model_version || '').toLowerCase();
                 const isOpus = modelStr.includes('opus');
                 
                 // Daily totals
