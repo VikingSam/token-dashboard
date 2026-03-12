@@ -585,7 +585,35 @@
 
         // Calculate cost for a row — uses cost_usd directly from console CSV
         function calculateCost(row) {
-            return parseFloat(row.cost_usd || 0);
+            // If cost_usd exists, use it
+            if (row.cost_usd && parseFloat(row.cost_usd) > 0) return parseFloat(row.cost_usd);
+            
+            // Otherwise calculate from token counts
+            const model = (row.model_version || '').toLowerCase();
+            let inputRate, cacheWriteRate, cacheReadRate, outputRate;
+            
+            if (model.includes('opus')) {
+                inputRate = 15; cacheWriteRate = 18.75; cacheReadRate = 1.50; outputRate = 75;
+            } else if (model.includes('sonnet')) {
+                inputRate = 3; cacheWriteRate = 3.75; cacheReadRate = 0.30; outputRate = 15;
+            } else if (model.includes('haiku')) {
+                inputRate = 0.25; cacheWriteRate = 0.30; cacheReadRate = 0.03; outputRate = 1.25;
+            } else {
+                inputRate = 3; cacheWriteRate = 3.75; cacheReadRate = 0.30; outputRate = 15;
+            }
+            
+            const uncached = parseInt(row.usage_input_tokens_no_cache || 0);
+            const cacheWrite5m = parseInt(row.usage_input_tokens_cache_write_5m || 0);
+            const cacheWrite1h = parseInt(row.usage_input_tokens_cache_write_1h || 0);
+            const cacheRead = parseInt(row.usage_input_tokens_cache_read || 0);
+            const output = parseInt(row.usage_output_tokens || 0);
+            
+            const cost = (uncached / 1e6 * inputRate) +
+                         ((cacheWrite5m + cacheWrite1h) / 1e6 * cacheWriteRate) +
+                         (cacheRead / 1e6 * cacheReadRate) +
+                         (output / 1e6 * outputRate);
+            
+            return cost;
         }
 
         // Calculate date range based on timeframe selection
