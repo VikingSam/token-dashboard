@@ -600,9 +600,24 @@
             return data;
         }
 
-        // Calculate cost for a row — uses cost_usd directly from Anthropic Console CSV
+        // Calculate cost for a row — uses cost_usd from Console CSV, falls back to token math
         function calculateCost(row) {
-            return parseFloat(row.cost_usd || 0);
+            if (row.cost_usd && parseFloat(row.cost_usd) > 0) return parseFloat(row.cost_usd);
+            // Fallback: calculate from token counts
+            const model = (row.model_version || '').toLowerCase();
+            let p;
+            if (model.includes('opus')) p = {input:15,cache5m:18.75,cache1h:3.75,cacheRead:1.5,output:75};
+            else if (model.includes('sonnet')) p = {input:3,cache5m:3.75,cache1h:0.75,cacheRead:0.3,output:15};
+            else if (model.includes('haiku')) p = {input:0.8,cache5m:1.0,cache1h:0.2,cacheRead:0.08,output:4};
+            else p = {input:15,cache5m:18.75,cache1h:3.75,cacheRead:1.5,output:75};
+            const g = (k) => parseFloat(row[k] || 0);
+            const cost = (g('usage_input_tokens_no_cache') * p.input
+                + g('usage_input_tokens_cache_write_5m') * p.cache5m
+                + g('usage_input_tokens_cache_write_1h') * p.cache1h
+                + g('usage_input_tokens_cache_read') * p.cacheRead
+                + g('usage_output_tokens') * p.output) / 1000000
+                + g('web_search_count') * 0.01;
+            return cost;
         }
 
         // Calculate date range based on timeframe selection
@@ -645,7 +660,7 @@
             
             filteredData.forEach(row => {
                 const date = row.usage_date_utc;
-                const agent = row.api_key === 'Blade2' ? 'Blade' : row.api_key;
+                const agent = row.api_key === 'Blade2' ? 'Ember' : row.api_key;
                 const cost = calculateCost(row);
                 const modelStr = (row.model || row.model_version || '').toLowerCase();
                 const isOpus = modelStr.includes('opus');
