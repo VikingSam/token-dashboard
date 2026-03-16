@@ -660,7 +660,7 @@
             
             filteredData.forEach(row => {
                 const date = row.usage_date_utc;
-                const agent = row.api_key === 'Blade2' ? 'Ember' : row.api_key;
+                const agent = row.api_key === 'Blade2' ? 'Blade' : row.api_key;
                 const cost = calculateCost(row);
                 const modelStr = (row.model || row.model_version || '').toLowerCase();
                 const isOpus = modelStr.includes('opus');
