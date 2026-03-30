@@ -14,21 +14,41 @@
     td:first-child,th:first-child { text-align:left; }
     tr:hover { background:#161616; }
   </style>
-<link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
 <div class="container">
   <div style="text-align:center;margin-bottom:30px;padding:20px;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:10px;border:1px solid #333;">
     <h1 style="font-size:2.2em;background:linear-gradient(45deg,#ff6b35,#c7161e,#0bb4a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">💰 Viking Token Dashboard</h1>
-    <div style="color:#888;margin-top:8px;">Last updated: March 30, 2026 at 5:07 AM CST · Source: Anthropic Console CSV · Dates in UTC</div>
+    <div style="color:#888;margin-top:8px;">Last updated: March 30, 2026 at 5:15 AM CST · Source: Anthropic Console CSV · Dates in UTC</div>
   </div>
   
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:25px;">
-      <div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:20px;text-align:center;">
-        <div style="color:#888;font-size:0.9em;">Month Total (March)</div>
-        <div style="font-size:2.2em;font-weight:bold;color:#ff6b35;">$6101.08</div>
-        <div style="color:#888;font-size:0.8em;">26 active days</div>
+    <!-- WHAT YOU ACTUALLY PAY — top row, prominent -->
+    <div style="background:linear-gradient(135deg,#0e1a0e,#1a2a1a);border:2px solid #22c55e;border-radius:12px;padding:24px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center;">
+      <div style="text-align:center;">
+        <div style="color:#22c55e;font-size:0.75em;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">💰 What You're Paying Anthropic</div>
+        <div style="font-size:3em;font-weight:900;color:#22c55e;">$2123<span style="font-size:0.4em;font-weight:400;color:#888;">/mo</span></div>
+        <div style="color:#888;font-size:0.8em;margin-top:4px;">Max Plan $250 + API agents $1873</div>
       </div>
+      <div style="text-align:center;border-left:1px solid #1e3a1e;border-right:1px solid #1e3a1e;padding:0 20px;">
+        <div style="color:#888;font-size:0.75em;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Blade (Max Plan)</div>
+        <div style="font-size:1.8em;font-weight:700;color:#fff;">$250<span style="font-size:0.5em;font-weight:400;color:#888;">/mo flat</span></div>
+        <div style="color:#888;font-size:0.75em;margin-top:4px;">API equiv: $4228 of value included</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="color:#888;font-size:0.75em;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Other Agents (API)</div>
+        <div style="font-size:1.8em;font-weight:700;color:#ff6b35;">$1873.45</div>
+        <div style="color:#888;font-size:0.75em;margin-top:4px;">Sheath + Frank + Ember + Bubba</div>
+      </div>
+    </div>
+
+    <!-- API EQUIVALENT VALUE — secondary, clearly labeled -->
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;">
+      <div style="color:#555;font-size:0.75em;font-weight:700;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;">📊 API Equivalent Value (not billed)</div>
+      <div style="font-size:1.5em;font-weight:700;color:#555;">$6101.08</div>
+      <div style="color:#444;font-size:0.8em;">← what Blade alone would cost at standard API rates. You save ~$3978 vs pay-per-token this month.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px;">
       <div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:20px;text-align:center;">
         <div style="color:#888;font-size:0.9em;">Today (2026-03-30 UTC)</div>
         <div style="font-size:2.2em;font-weight:bold;color:#0bb4a0;">$59.48</div>
@@ -37,15 +57,12 @@
       <div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:20px;text-align:center;">
         <div style="color:#888;font-size:0.9em;">Daily Average</div>
         <div style="font-size:2.2em;font-weight:bold;">$234.66</div>
-        <div style="color:#888;font-size:0.8em;">across active days</div>
+        <div style="color:#888;font-size:0.8em;">API equiv across 26 active days</div>
       </div>
       <div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:20px;text-align:center;">
-        <div style="color:#888;font-size:0.9em;">Budget: $2,000</div>
-        <div style="font-size:1.8em;font-weight:bold;color:#c7161e;">$4101.08 OVER</div>
-        <div style="background:#333;border-radius:4px;height:10px;margin-top:8px;overflow:hidden;">
-          <div style="background:#c7161e;height:100%;width:100.0%;"></div>
-        </div>
-        <div style="color:#c7161e;font-size:0.8em;margin-top:4px;">🔴 OVER BUDGET (305%)</div>
+        <div style="color:#888;font-size:0.9em;">March ROI</div>
+        <div style="font-size:2.2em;font-weight:bold;color:#22c55e;">3x</div>
+        <div style="color:#888;font-size:0.8em;">$6101 value for $2123 spent</div>
       </div>
     </div>
   
