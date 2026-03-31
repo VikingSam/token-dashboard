@@ -707,6 +707,7 @@ usage_date_utc,model,workspace,api_key,usage_type,context_window,token_type,cost
 2026-03-28,Claude Sonnet 4.6,Default,Frank,message,200k - 1M,input_no_cache,0.00,token,global,
 2026-03-28,Claude Sonnet 4.6,Default,Frank,message,200k - 1M,input_cache_read,2.82,token,global,
 2026-03-28,Claude Sonnet 4.6,Default,Frank,message,200k - 1M,input_cache_write_5m,11.58,token,global,
+2026-03-28,Claude Sonnet 4.6,Default,Frank,message,200k - 1M,output,0.16,token,global,
 2026-03-28,Claude Sonnet 4.6,Default,Ember,message,≤ 200k,input_no_cache,0.00,token,global,
 2026-03-28,Claude Sonnet 4.6,Default,Ember,message,≤ 200k,input_cache_read,5.99,token,global,
 2026-03-28,Claude Sonnet 4.6,Default,Ember,message,≤ 200k,input_cache_write_5m,15.57,token,global,
