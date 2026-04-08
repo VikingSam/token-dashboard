@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-04-08T17:05:28.356015+00:00",
-  "month_total": 1332.26,
-  "today_total": 248.87,
+  "generated_at": "2026-04-08T17:16:22.487082+00:00",
+  "month_total": 166.92,
+  "today_total": 36.5,
   "today_date": "2026-04-08",
   "agent_totals": {
-    "Ember": 100.63,
-    "Sheath": 199.23,
-    "Blade": 666.79,
-    "Frank": 300.78999999999996,
-    "Bubba": 64.82
+    "Bubba": 49.55,
+    "Sheath": 116.25,
+    "Frank": 0.0,
+    "Ember": 0.0,
+    "Blade": 1.12
   },
   "daily_totals": {
     "2026-04-01": 86.13,
